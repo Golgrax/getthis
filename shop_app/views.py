@@ -1,5 +1,3 @@
-# --- START OF FULLY REVISED views.py ---
-
 import dominate
 from dominate.tags import *
 from dominate.util import raw
@@ -10,7 +8,7 @@ def form_field(label_text, input_id, input_type='text', placeholder=''):
         label(label_text, _for=input_id, class_='block text-gray-700 font-semibold mb-2')
         input_(id=input_id, type=input_type, placeholder=placeholder, class_='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500')
 
-# --- SECTION CREATORS ---
+# --- SECTION CREATORS (Functions that build parts of the page) ---
 
 def _create_login_section():
     with section(id='login', class_='section p-4 active'): # Active by default
@@ -35,17 +33,16 @@ def _create_register_section():
             form_field('Name:', 'register-name', 'text', 'Juan Dela Cruz')
             form_field('Email Address:', 'register-email', 'email', 'juan.delacruz@iskolar.pup.edu.ph')
             form_field('Password:', 'register-password', 'password')
-            # In a real app, add confirm password field and JS validation
             with div(class_='space-y-3 mt-4'):
                  button('REGISTER', type='submit', class_='w-full bg-cyan-500 text-white py-3 rounded-lg font-semibold hover:bg-cyan-600 transition-colors')
                  button('Back to LOGIN', type='button', onclick="showAuthSection('login')", class_='w-full bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-400 transition-colors')
 
 def _create_main_app_shell():
-    # This creates the wrapper for the logged-in user experience
-    with header(class_='pup-bg-burgundy text-white p-4 shadow-lg sticky top-0 z-40'):
+    with header(id='main-header', class_='pup-bg-burgundy text-white p-4 shadow-lg sticky top-0 z-40'):
         with div(class_='flex items-center justify-between'):
             with div(class_='flex items-center space-x-3'):
-                img(src="/static/images/pup_logo.png", class_="w-10 h-10")
+                with div(class_='w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center'):
+                    i(class_='fas fa-star text-red-800')
                 with div():
                     h1('StudywithStyle', class_='text-lg font-bold')
                     p('PUP Official Store', class_='text-xs opacity-90')
@@ -60,7 +57,7 @@ def _create_main_app_shell():
         _create_cart_section()
         _create_profile_section()
 
-    with nav(class_='bottom-nav pup-bg-burgundy text-white'):
+    with nav(id='bottom-nav', class_='bottom-nav pup-bg-burgundy text-white'):
         with div(class_='flex justify-around items-center py-3'):
             with button(onclick="showAppSection('homepage')", class_='nav-btn flex flex-col items-center space-y-1'):
                 i(class_='fas fa-home text-xl')
@@ -78,7 +75,6 @@ def _create_homepage_section():
         with div(class_="mb-6"):
             h2("Featured Products", class_="text-2xl font-bold pup-text-burgundy mb-2")
             p("Official PUP merchandise and study essentials", class_="text-gray-600")
-        
         with div(id="product-list", class_="grid grid-cols-1 md:grid-cols-2 gap-4"):
             p("Loading products...")
 
@@ -98,7 +94,6 @@ def _create_profile_section():
             div(class_='w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4', _children=[i(class_='fas fa-user text-3xl text-gray-600')])
             h2('Profile', class_='text-2xl font-bold pup-text-burgundy')
             p(id="user-name-display", class_="text-gray-600")
-        
         button('Logout', onclick='handleLogout()', class_='w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold')
 
 
@@ -107,33 +102,57 @@ def generate_full_page():
     with doc.head:
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        link(href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css", rel="stylesheet")
+
+        # --- THIS IS THE CRITICAL CHANGE ---
+        # 1. Use the Tailwind Play CDN script instead of the static CSS link.
+        # 2. Configure our custom font and colors directly inside it.
+        script(src="https://cdn.tailwindcss.com")
+        script(raw("""
+            tailwind.config = {
+              theme: {
+                extend: {
+                  colors: {
+                    'pup-burgundy': '#722F37',
+                    'pup-gold': '#FFD700',
+                  },
+                  fontFamily: {
+                    sans: ['RocaOne', 'sans-serif'],
+                  }
+                }
+              }
+            }
+        """))
+        # ------------------------------------
+
         link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css")
-        link(rel="stylesheet", href="/static/css/style.css")
+        link(rel="stylesheet", href="/static/css/style.css") # Still needed for the @font-face rule
+
         style(raw("""
-            :root { --pup-burgundy: #722F37; }
-            body { font-family: 'RocaOne', sans-serif; }
-            .pup-bg-burgundy { background-color: var(--pup-burgundy); }
-            .pup-text-burgundy { color: var(--pup-burgundy); }
-            .bottom-nav, .content-container { display: none; }
+            /* This is now much simpler */
+            .main-app-container { display: none; }
             .section, .app-section { display: none; }
             .section.active, .app-section.active { display: block; }
+            .pup-text-burgundy { color: #722F37; }
+            .pup-bg-burgundy { background-color: #722F37; }
             .cart-badge { position: absolute; top: -8px; right: -8px; background: #EF4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+            .content-container { padding-bottom: 80px; }
+            .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; }
         """))
 
-    doc.body['class'] = 'bg-gray-50 font-sans'
+    doc.body['class'] = 'bg-gray-50 font-sans' # The custom font is now applied via tailwind.config
     with doc:
-        # --- Auth View (Visible by default) ---
         with div(id='auth-container'):
             _create_login_section()
             _create_register_section()
-        
-        # --- Main App View (Hidden by default) ---
-        with div(id='main-app-container', style='display: none;'):
+        with div(id='main-app-container'):
             _create_main_app_shell()
 
-        # --- JavaScript ---
         script(raw("""
+            // --- STATE & NAVIGATION ---
+            function showAuthSection(sectionName) { /* ... same as before ... */ }
+            function showAppSection(sectionName) { /* ... same as before ... */ }
+            // ... all other javascript functions are the same ...
+            
             // --- STATE MANAGEMENT & NAVIGATION ---
             function showAuthSection(sectionName) {
                 document.querySelectorAll('#auth-container .section').forEach(s => s.classList.remove('active'));
@@ -228,13 +247,16 @@ def generate_full_page():
                 const container = document.getElementById('cart-items');
                 const summary = document.getElementById('cart-summary');
                 if (items.length === 0) {
-                    container.innerHTML = '<p class="text-center text-gray-500">Your cart is empty.</p>';
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8"><i class="fas fa-shopping-cart text-4xl mb-4"></i><p>Your cart is empty</p></div>';
                     summary.style.display = 'none';
                 } else {
                     container.innerHTML = items.map(item => `
                         <div class="bg-white rounded-lg p-3 flex justify-between items-center">
-                            <p class="font-semibold">${item.name} (x${item.quantity})</p>
-                            <p>₱${(item.price * item.quantity).toFixed(2)}</p>
+                            <div>
+                                <h4 class="font-semibold pup-text-burgundy">${item.name}</h4>
+                                <p class="text-sm text-gray-500">x ${item.quantity}</p>
+                            </div>
+                            <p class="font-bold">₱${(item.price * item.quantity).toFixed(2)}</p>
                         </div>`).join('');
                     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     document.getElementById('cart-total').textContent = `₱${total.toFixed(2)}`;
@@ -253,7 +275,14 @@ def generate_full_page():
             }
 
             // --- Init & Util ---
-            function showNotification(msg) { /* ... same as before ... */ }
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-green-500 text-white p-3 rounded-lg shadow-lg z-50';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            }
+            
             function checkout() { alert('Checkout not implemented.'); }
 
             window.addEventListener('pywebviewready', () => {
