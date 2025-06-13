@@ -1,5 +1,6 @@
 import dominate
 from dominate.tags import *
+from dominate.util import raw  # <-- THIS IS THE NEW LINE TO FIX THE ERROR
 
 def generate_main_page(products):
     doc = dominate.document(title="PUP Mobile Store - StudywithStyle")
@@ -11,7 +12,7 @@ def generate_main_page(products):
         link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css")
         link(rel="stylesheet", href="/static/css/style.css") # Link to our custom font styles
 
-        style("""
+        style(raw("""
             :root {
                 --pup-burgundy: #722F37; --pup-gold: #FFD700; --pup-dark-burgundy: #5A252A;
             }
@@ -27,9 +28,8 @@ def generate_main_page(products):
                 border-radius: 50%; width: 20px; height: 20px; font-size: 12px;
                 display: flex; align-items: center; justify-content: center;
             }
-        """)
+        """))
 
-    # THIS IS THE CRITICAL FIX:
     # Set attributes on the existing doc.body object directly.
     doc.body['class'] = 'bg-gray-50 font-sans'
     
