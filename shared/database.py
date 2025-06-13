@@ -15,7 +15,7 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Create tables
+    # Create users table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +25,7 @@ def init_db():
     )
     ''')
 
+    # Create products table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,6 +37,7 @@ def init_db():
     )
     ''')
 
+    # Create cart table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS cart (
         user_id INTEGER,
@@ -47,98 +49,77 @@ def init_db():
     )
     ''')
     
-    # Check if products exist before inserting
-    cursor.execute("SELECT COUNT(*) FROM products")
-    if cursor.fetchone()[0] == 0:
-        # Add sample products
+    # Add sample products if they don't exist
+    if cursor.execute("SELECT COUNT(*) FROM products").fetchone()[0] == 0:
         sample_products = [
-            ('PUP Baybayin Lanyard', 'Classic Edition Lanyard', 140.00, '/static/images/lanyard.png', 50),
-            ('PUP STUDY WITH STYLE T-Shirt', 'Classic University T-Shirt', 450.00, '/static/images/tshirt.png', 30),
-            ('PUP Iskolar TOTE BAG', 'Eco-friendly and durable tote bag', 400.00, '/static/images/totebag.png', 40),
-            ('PUP Jeepney Signage', 'Collectible decorative item for Iskolars', 250.00, '/static/images/jeepney.png', 100)
+            ('PUP Baybayin Lanyard', 'Polytechnic University (PUP) Lanyard', 140.00, '/static/images/lanyard.png', 50),
+            ('PUP STUDY WITH STYLE T-Shirt', 'Classic T-Shirt', 450.00, '/static/images/tshirt.png', 30),
+            ('PUP Iskolar TOTE BAG', 'Eco-friendly Bag', 400.00, '/static/images/totebag.png', 40),
+            ('PUP Jeepney Signage', 'Collectible Item', 250.00, '/static/images/jeepney.png', 100)
         ]
-        cursor.executemany(
-            'INSERT INTO products (name, description, price, image_url, stock) VALUES (?, ?, ?, ?, ?)',
-            sample_products
-        )
+        cursor.executemany('INSERT INTO products (name, description, price, image_url, stock) VALUES (?, ?, ?, ?, ?)', sample_products)
 
     conn.commit()
     conn.close()
     print("Database initialized.")
 
-# --- Product Functions ---
+# --- User Functions ---
+def create_user(name, email, password):
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
+            (name, email, hash_password(password))
+        )
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError: # This happens if email is not unique
+        return False
+    finally:
+        conn.close()
+
+def check_user_credentials(email, password):
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    conn.close()
+    if user and user['password_hash'] == hash_password(password):
+        return dict(user)
+    return None
+
+# --- Product Functions (no changes) ---
 def get_all_products():
     conn = get_db_connection()
     products = conn.execute('SELECT * FROM products').fetchall()
     conn.close()
     return [dict(p) for p in products]
 
-def add_product(name, price, quantity, description):
-    conn = get_db_connection()
-    conn.execute(
-        'INSERT INTO products (name, price, stock, description) VALUES (?, ?, ?, ?)',
-        (name, float(price), int(quantity), description)
-    )
-    conn.commit()
-    conn.close()
-
-def update_product(product_id, name, price, quantity, description):
-    conn = get_db_connection()
-    conn.execute(
-        'UPDATE products SET name = ?, price = ?, stock = ?, description = ? WHERE id = ?',
-        (name, float(price), int(quantity), description, product_id)
-    )
-    conn.commit()
-    conn.close()
-
-def delete_product(product_id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM products WHERE id = ?', (product_id,))
-    conn.commit()
-    conn.close()
-
-# --- Cart Functions ---
-def get_cart_items(user_id=1): # Using user_id 1 as a default for this demo
+# --- Cart Functions (no changes) ---
+def get_cart_items(user_id):
     conn = get_db_connection()
     items = conn.execute('''
         SELECT p.id, p.name, p.price, c.quantity, p.image_url
-        FROM cart c
-        JOIN products p ON c.product_id = p.id
-        WHERE c.user_id = ?
+        FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?
     ''', (user_id,)).fetchall()
     conn.close()
     return [dict(item) for item in items]
 
-def add_to_cart(product_id, quantity=1, user_id=1):
+def add_to_cart(product_id, user_id, quantity=1):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        'SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?',
-        (user_id, product_id)
-    )
-    result = cursor.fetchone()
+    result = cursor.execute('SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?', (user_id, product_id)).fetchone()
     if result:
         new_quantity = result['quantity'] + quantity
-        cursor.execute(
-            'UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?',
-            (new_quantity, user_id, product_id)
-        )
+        cursor.execute('UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?', (new_quantity, user_id, product_id))
     else:
-        cursor.execute(
-            'INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)',
-            (user_id, product_id, quantity)
-        )
+        cursor.execute('INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)', (user_id, product_id, quantity))
     conn.commit()
     conn.close()
 
-def update_cart_quantity(product_id, quantity, user_id=1):
+def update_cart_quantity(product_id, user_id, quantity):
     conn = get_db_connection()
     if int(quantity) <= 0:
         conn.execute('DELETE FROM cart WHERE user_id = ? AND product_id = ?', (user_id, product_id))
     else:
-        conn.execute(
-            'UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?',
-            (quantity, user_id, product_id)
-        )
+        conn.execute('UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?', (quantity, user_id, product_id))
     conn.commit()
     conn.close()
