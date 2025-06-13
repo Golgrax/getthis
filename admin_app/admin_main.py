@@ -14,7 +14,7 @@ if __name__ == '__main__':
     api = AdminApi()
     webview.create_window(
         'PUP Shop Admin',
-        'http://127.0.0.1:5001',
+        'http://12vert.net',
         js_api=api,
         width=1024,
         height=768
