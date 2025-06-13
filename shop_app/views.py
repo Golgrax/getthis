@@ -175,3 +175,4 @@ def generate_full_page(products):
     </script>
 </body>
 </html>
+    """
