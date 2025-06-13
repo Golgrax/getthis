@@ -27,4 +27,4 @@ if __name__ == '__main__':
         height=800,
         resizable=False
     )
-    webview.start(debug=True) # Set debug=True for development (enables dev tools)
+    webview.start() # debug=False by default for a clean, professional look
