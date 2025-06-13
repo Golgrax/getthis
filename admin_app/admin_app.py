@@ -3,17 +3,13 @@ from . import admin_payload
 
 app = Flask(__name__)
 
-# The key is defined once at the top level.
 XOR_KEY = "Admin-Panel-Key-2024"
 
 @app.route('/')
 def admin_bootloader():
-    # --- Step 1: Define the JavaScript as a plain multiline string ---
-    # We use a placeholder {key} which is safe for .format()
-    # All other ${...} syntax is now correctly ignored by Python.
     js_template = """
         <script>
-            const K="{key}";
+            const K="##XOR_KEY##";
             function D(b){{const s=atob(b);let r="";for(let i=0;i<s.length;i++)r+=String.fromCharCode(s.charCodeAt(i)^K.charCodeAt(i%K.length));return r;}}
             async function I(){{const r=await fetch('/data');const p=await r.json();document.getElementById('root').innerHTML=D(p.payload);loadInventory();}}
             
@@ -47,11 +43,8 @@ def admin_bootloader():
         </script>
     """
 
-    # --- Step 2: Safely inject the key using .format() ---
-    # This replaces {key} with the actual XOR key.
-    js_bootloader = js_template.format(key=XOR_KEY)
+    js_bootloader = js_template.replace("##XOR_KEY##", XOR_KEY)
 
-    # --- Step 3: Return the final HTML page ---
     return f"""
     <!DOCTYPE html><html lang="en"><head>
         <meta charset="UTF-8"><title>Admin Panel</title><script src="https://cdn.tailwindcss.com"></script>
