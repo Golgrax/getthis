@@ -29,8 +29,13 @@ def generate_main_page(products):
             }
         """)
 
-    with doc.body(class_="bg-gray-50 font-sans"):
-        # Header
+    # THIS IS THE CRITICAL FIX:
+    # Set attributes on the existing doc.body object directly.
+    doc.body['class'] = 'bg-gray-50 font-sans'
+    
+    # The `with doc:` block adds content INSIDE the <body> tag.
+    with doc:
+        # Header (Using with header(...) is correct because we are creating a new tag)
         with header(class_="pup-bg-burgundy text-white p-4 shadow-lg sticky top-0 z-40"):
             with div(class_="flex items-center justify-between"):
                 with div(class_="flex items-center space-x-3"):
