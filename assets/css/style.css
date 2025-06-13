@@ -1,16 +1,9 @@
-/*
-  Place your RocaOne.ttf file in the assets/fonts/ directory.
-  This CSS will load it for the webview to use.
-*/
+
 @font-face {
   font-family: 'RocaOne';
   src: url('/static/fonts/RocaOne.ttf') format('truetype');
 }
 
-/* 
-  Use a fallback font just in case. 
-  Tailwind will be configured to use this.
-*/
 body {
   font-family: 'RocaOne', sans-serif;
 }

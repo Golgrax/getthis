@@ -30,7 +30,6 @@ def init_db():
     conn.close()
     print("Database initialized with order tables.")
 
-# --- User Functions (no change) ---
 def create_user(name, email, password):
     conn = get_db_connection()
     try:

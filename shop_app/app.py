@@ -7,7 +7,7 @@ XOR_KEY = "PUP-Sinta-2024-IskolarNgBayan"
 
 @app.route('/')
 def bootloader():
-    """Serves the stable HTML shell for our secure application."""
+    """secure application."""
     bootloader_html = f"""
 <!DOCTYPE html><html lang="en">
 <head>
@@ -22,11 +22,9 @@ def bootloader():
         function D(b){{const s=atob(b);let r="";for(let i=0;i<s.length;i++)r+=String.fromCharCode(s.charCodeAt(i)^K.charCodeAt(i%K.length));return r;}}
         async function I(){{try{{const r=await fetch('/data');const p=await r.json();const root=document.getElementById('root');root.innerHTML=D(p.auth)+D(p.app);document.getElementById('login-form').addEventListener('submit',handleLogin);document.getElementById('register-form').addEventListener('submit',handleRegister);L();}}catch(e){{root.innerHTML='<p style="color:red;text-align:center;">Failed to load application.</p>';console.error("Bootloader Error:",e);}}}}
         
-        // THIS FUNCTION (L) IS THE ONLY ONE THAT'S CHANGED
         function L(){{
             window.pywebview.api.get_products().then(p => {{
                 if (!p) return;
-                // It now generates an <img> tag for each product
                 document.getElementById('product-list').innerHTML = p.map(i => `
                     <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4">
                         <img src="${{i.image_url || '/static/images/placeholder.png'}}" alt="${{i.name}}" class="w-20 h-20 object-cover rounded-lg bg-gray-200">
@@ -40,7 +38,6 @@ def bootloader():
             }});
         }}
 
-        // All other JS functions remain the same
         function showAuthSection(id){{document.querySelectorAll('.auth-section').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';}}
         function showAppSection(id){{document.querySelectorAll('.app-view').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';if(id==='cart-app-view')loadCart();if(id==='checkout-app-view')loadCheckoutSummary();}}
         function showMainApp(user){{document.getElementById('auth-view').style.display='none';document.getElementById('main-app-view').style.display='block';document.getElementById('user-name-display').textContent=`Welcome, ${{user.name}}!`;updateCartBadge();}}

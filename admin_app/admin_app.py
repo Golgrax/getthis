@@ -3,7 +3,7 @@ from . import admin_payload
 
 app = Flask(__name__)
 
-XOR_KEY = "Admin-Panel-Key-2024" # Must match the admin build script
+XOR_KEY = "Admin-Panel-Key-2024"
 
 @app.route('/')
 def admin_bootloader():
@@ -36,5 +36,4 @@ def admin_bootloader():
 
 @app.route('/data')
 def get_admin_payload():
-    # THIS IS THE CORRECTED LINE
     return jsonify({'payload': admin_payload.ADMIN_PAYLOAD})

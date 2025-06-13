@@ -1,5 +1,3 @@
-# build_payload.py
-
 import base64
 
 XOR_KEY = "PUP-Sinta-2024-IskolarNgBayan"
@@ -18,7 +16,6 @@ def create_payload_file():
     """Reads the clean UI, encrypts it, and writes it to shop_app/payload.py"""
     print("Compiling Shop UI...")
     
-    # --- Clean HTML Definitions ---
     auth_view_html = """
     <div id="auth-view" class="page-view active">
         <section id="login-section" class="auth-section active p-4">

@@ -1,9 +1,8 @@
 import base64
 
-XOR_KEY = "Admin-Panel-Key-2024" # A different key for the admin panel
+XOR_KEY = "Admin-Panel-Key-2024"
 
 def xor_and_encode(html_string):
-    """Encrypts a string with XOR and encodes it to Base64."""
     encrypted_chars = []
     for i in range(len(html_string)):
         key_char = XOR_KEY[i % len(XOR_KEY)]
@@ -52,10 +51,8 @@ def create_admin_payload():
     
     encrypted_payload = xor_and_encode(admin_html)
     
-    # This line creates the admin_payload.py file
     with open("admin_app/admin_payload.py", "w") as f:
         f.write("# This file is auto-generated. DO NOT EDIT.\n")
-        # This line ensures the variable is named correctly
         f.write(f'ADMIN_PAYLOAD = "{encrypted_payload}"')
         
     print("✅ Admin UI compiled successfully into admin_app/admin_payload.py")
