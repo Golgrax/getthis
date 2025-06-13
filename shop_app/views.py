@@ -29,63 +29,61 @@ def generate_main_page(products):
             }
         """)
 
-    with doc.body(cls="bg-gray-50 font-sans"):
+    with doc.body(class_="bg-gray-50 font-sans"):
         # Header
-        with header(cls="pup-bg-burgundy text-white p-4 shadow-lg sticky top-0 z-40"):
-            with div(cls="flex items-center justify-between"):
-                with div(cls="flex items-center space-x-3"):
-                    img(src="/static/images/pup_logo.png", cls="w-10 h-10")
+        with header(class_="pup-bg-burgundy text-white p-4 shadow-lg sticky top-0 z-40"):
+            with div(class_="flex items-center justify-between"):
+                with div(class_="flex items-center space-x-3"):
+                    img(src="/static/images/pup_logo.png", class_="w-10 h-10")
                     with div():
-                        h1("StudywithStyle", cls="text-lg font-bold")
-                        p("PUP Official Store", cls="text-xs opacity-90")
-                with div(cls="flex space-x-3"):
-                    with button(onclick="showSection('cart')", cls="relative p-2 bg-black bg-opacity-20 rounded-full"):
-                        i(cls="fas fa-shopping-cart")
-                        span(id="cart-badge", cls="cart-badge", style="display: none;")
-                    with button(onclick="showSection('profile')", cls="p-2 bg-black bg-opacity-20 rounded-full"):
-                        i(cls="fas fa-user")
+                        h1("StudywithStyle", class_="text-lg font-bold")
+                        p("PUP Official Store", class_="text-xs opacity-90")
+                with div(class_="flex space-x-3"):
+                    with button(onclick="showSection('cart')", class_="relative p-2 bg-black bg-opacity-20 rounded-full"):
+                        i(class_="fas fa-shopping-cart")
+                        span(id="cart-badge", class_="cart-badge", style="display: none;")
+                    with button(onclick="showSection('profile')", class_="p-2 bg-black bg-opacity-20 rounded-full"):
+                        i(class_="fas fa-user")
         
         # Main Content
-        with main(cls="content-container"):
+        with main(class_="content-container"):
             # Homepage Section
-            with section(id="homepage", cls="section active p-4"):
-                with div(cls="mb-6"):
-                    h2("Featured Products", cls="text-2xl font-bold pup-text-burgundy mb-2")
-                    p("Official PUP merchandise and study essentials", cls="text-gray-600")
+            with section(id="homepage", class_="section active p-4"):
+                with div(class_="mb-6"):
+                    h2("Featured Products", class_="text-2xl font-bold pup-text-burgundy mb-2")
+                    p("Official PUP merchandise and study essentials", class_="text-gray-600")
                 
-                with div(id="product-list", cls="grid grid-cols-1 md:grid-cols-2 gap-4"):
-                    # Products will be injected here by JavaScript
+                with div(id="product-list", class_="grid grid-cols-1 md:grid-cols-2 gap-4"):
                     pass
 
             # Shopping Cart Section
-            with section(id="cart", cls="section p-4"):
-                h2("Shopping Cart", cls="text-2xl font-bold pup-text-burgundy mb-4")
-                div(id="cart-items", cls="space-y-4 mb-6")
-                with div(id="cart-summary", style="display: none;", cls="bg-white rounded-lg shadow-lg p-4 mb-6"):
-                    with div(cls="flex justify-between items-center text-lg font-bold pup-text-burgundy"):
+            with section(id="cart", class_="section p-4"):
+                h2("Shopping Cart", class_="text-2xl font-bold pup-text-burgundy mb-4")
+                div(id="cart-items", class_="space-y-4 mb-6")
+                with div(id="cart-summary", style="display: none;", class_="bg-white rounded-lg shadow-lg p-4 mb-6"):
+                    with div(class_="flex justify-between items-center text-lg font-bold pup-text-burgundy"):
                         span("Total:")
                         span(id="cart-total")
-                    button(id="checkout-btn", onclick="checkout()", cls="w-full mt-4 pup-bg-burgundy text-white py-3 rounded-lg font-bold")
+                    button(id="checkout-btn", onclick="checkout()", class_="w-full mt-4 pup-bg-burgundy text-white py-3 rounded-lg font-bold")
 
             # Profile/Login/Register Section
-            with section(id="profile", cls="section p-4"):
-                h2("Profile & Account", cls="text-2xl font-bold pup-text-burgundy mb-4")
-                # Add profile content here (order history, etc.)
+            with section(id="profile", class_="section p-4"):
+                h2("Profile & Account", class_="text-2xl font-bold pup-text-burgundy mb-4")
                 p("Login, registration, and profile details would go here.")
 
         # Bottom Navigation
-        with nav(cls="bottom-nav pup-bg-burgundy text-white"):
-            with div(cls="flex justify-around items-center py-3"):
-                with button(onclick="showSection('homepage')", cls="nav-btn flex flex-col items-center space-y-1"):
-                    i(cls="fas fa-home text-xl")
-                    span("Home", cls="text-xs")
-                with button(onclick="showSection('cart')", cls="nav-btn flex flex-col items-center space-y-1 relative"):
-                    i(cls="fas fa-shopping-cart text-xl")
-                    span("Cart", cls="text-xs")
-                    span(id="nav-cart-badge", cls="cart-badge", style="display: none;")
-                with button(onclick="showSection('profile')", cls="nav-btn flex flex-col items-center space-y-1"):
-                    i(cls="fas fa-user text-xl")
-                    span("Profile", cls="text-xs")
+        with nav(class_="bottom-nav pup-bg-burgundy text-white"):
+            with div(class_="flex justify-around items-center py-3"):
+                with button(onclick="showSection('homepage')", class_="nav-btn flex flex-col items-center space-y-1"):
+                    i(class_="fas fa-home text-xl")
+                    span("Home", class_="text-xs")
+                with button(onclick="showSection('cart')", class_="nav-btn flex flex-col items-center space-y-1 relative"):
+                    i(class_="fas fa-shopping-cart text-xl")
+                    span("Cart", class_="text-xs")
+                    span(id="nav-cart-badge", class_="cart-badge", style="display: none;")
+                with button(onclick="showSection('profile')", class_="nav-btn flex flex-col items-center space-y-1"):
+                    i(class_="fas fa-user text-xl")
+                    span("Profile", class_="text-xs")
         
         # JavaScript logic
         script(raw("""
