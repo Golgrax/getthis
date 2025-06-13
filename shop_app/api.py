@@ -4,7 +4,6 @@ class Api:
     def __init__(self):
         self.current_user = None
 
-    # --- Auth ---
     def login(self, email, password):
         user = database.check_user_credentials(email, password)
         if user:
@@ -20,11 +19,9 @@ class Api:
         self.current_user = None
         return {'success': True}
 
-    # --- Products ---
     def get_products(self):
         return database.get_all_products()
 
-    # --- Cart ---
     def get_cart(self):
         if not self.current_user: return []
         return database.get_cart_items(user_id=self.current_user['id'])
@@ -39,7 +36,6 @@ class Api:
         database.update_cart_quantity(product_id=product_id, user_id=self.current_user['id'], quantity=quantity)
         return {'status': 'success'}
 
-    # --- Checkout (NEW) ---
     def place_order(self):
         if not self.current_user:
             return {'success': False, 'message': 'User not logged in.'}

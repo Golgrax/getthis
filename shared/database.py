@@ -16,7 +16,6 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # --- All Tables ---
     cursor.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL)')
     cursor.execute('CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT, price REAL NOT NULL, image_url TEXT, stock INTEGER NOT NULL DEFAULT 0)')
     cursor.execute('CREATE TABLE IF NOT EXISTS cart (user_id INTEGER, product_id INTEGER, quantity INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users (id), FOREIGN KEY (product_id) REFERENCES products (id), PRIMARY KEY (user_id, product_id))')
@@ -48,14 +47,12 @@ def check_user_credentials(email, password):
     if user and user['password_hash'] == hash_password(password): return dict(user)
     return None
 
-# --- Product Functions (no change) ---
 def get_all_products():
     conn = get_db_connection()
     products = conn.execute('SELECT * FROM products').fetchall()
     conn.close()
     return [dict(p) for p in products]
 
-# --- Cart Functions (no change)---
 def get_cart_items(user_id):
     conn = get_db_connection()
     items = conn.execute('SELECT p.id, p.name, p.price, c.quantity FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?', (user_id,)).fetchall()
@@ -64,7 +61,6 @@ def get_cart_items(user_id):
 
 def add_to_cart(product_id, user_id, quantity=1):
     conn = get_db_connection()
-    # ... (code is the same, shortened for brevity)
     cursor = conn.cursor()
     result = cursor.execute('SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?', (user_id, product_id)).fetchone()
     if result:
@@ -85,20 +81,16 @@ def update_cart_quantity(product_id, user_id, quantity):
     conn.commit()
     conn.close()
 
-# --- Order Functions (NEW) ---
 def create_order(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # 1. Get cart items for the user
     cart_items = get_cart_items(user_id)
     if not cart_items:
-        return None # Cannot create order from empty cart
+        return None
 
-    # 2. Calculate total
     total_amount = sum(item['price'] * item['quantity'] for item in cart_items)
 
-    # 3. Create the order
     order_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute(
         'INSERT INTO orders (user_id, order_date, status, total_amount) VALUES (?, ?, ?, ?)',
@@ -106,14 +98,12 @@ def create_order(user_id):
     )
     order_id = cursor.lastrowid
 
-    # 4. Move cart items to order_items
     for item in cart_items:
         cursor.execute(
             'INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)',
             (order_id, item['id'], item['quantity'], item['price'])
         )
 
-    # 5. Clear the user's cart
     cursor.execute('DELETE FROM cart WHERE user_id = ?', (user_id,))
     
     conn.commit()

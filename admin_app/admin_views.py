@@ -25,7 +25,6 @@ def generate_admin_page():
                 button("Delete Item", onclick="deleteItem()", cls="bg-red-500 text-white px-4 py-2 rounded")
                 button("Clear Form", type="button", onclick="clearForm()", cls="bg-gray-500 text-white px-4 py-2 rounded")
         
-        # Table
         with div(cls="bg-white p-6 rounded-lg shadow-md"):
             h2("Current Inventory", cls="text-xl font-semibold mb-4")
             with table(id="inventory-table", cls="w-full text-left"):

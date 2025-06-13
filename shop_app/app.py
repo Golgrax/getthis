@@ -1,55 +1,46 @@
 from flask import Flask, jsonify
-from . import payload  # Import the obfuscated data
+from . import payload
 
 app = Flask(__name__, static_folder='../assets', static_url_path='/static')
 
-# This key MUST match the key in build_payload.py
 XOR_KEY = "PUP-Sinta-2024-IskolarNgBayan"
 
 @app.route('/')
 def bootloader():
-    """
-    Serves a stable HTML shell. The JavaScript will fetch the encrypted payload
-    and inject it into the <div id="root">. This is a robust method.
-    """
-    return f"""
-<!DOCTYPE html>
-<html lang="en">
+    """Serves the stable HTML shell for our secure application."""
+    bootloader_html = f"""
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>PUP E-Commerce Shop</title>
     <script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>:root{{--pup-burgundy:#722F37;}}.pup-bg-burgundy{{background-color:var(--pup-burgundy);}}.pup-text-burgundy{{color:var(--pup-burgundy);}}.page-view,.app-view{{display:none;}}.page-view.active,.app-view.active{{display:block;}}.bottom-nav{{position:fixed;bottom:0;left:0;right:0;z-index:50;}}.content-container{{padding-bottom:80px;}}.cart-badge{{position:absolute;top:-5px;right:-5px;background:#EF4444;color:white;border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center;}}</style>
 </head>
 <body class="bg-gray-100">
-    <div id="root">
-        <p style="text-align: center; padding-top: 4rem; font-family: sans-serif;">Loading Secure Application...</p>
-    </div>
+    <div id="root"><p style="text-align:center;padding:4rem;font-family:sans-serif;">Loading Secure Application...</p></div>
     <script>
         const K="{XOR_KEY}";
         function D(b){{const s=atob(b);let r="";for(let i=0;i<s.length;i++)r+=String.fromCharCode(s.charCodeAt(i)^K.charCodeAt(i%K.length));return r;}}
+        async function I(){{try{{const r=await fetch('/data');const p=await r.json();const root=document.getElementById('root');root.innerHTML=D(p.auth)+D(p.app);document.getElementById('login-form').addEventListener('submit',handleLogin);document.getElementById('register-form').addEventListener('submit',handleRegister);L();}}catch(e){{root.innerHTML='<p style="color:red;text-align:center;">Failed to load application.</p>';console.error("Bootloader Error:",e);}}}}
         
-        async function I(){{
-            try {{
-                const r=await fetch('/data');
-                const p=await r.json();
-                const root=document.getElementById('root');
-                root.innerHTML = D(p.auth) + D(p.app);
-                document.getElementById('login-form').addEventListener('submit',handleLogin);
-                document.getElementById('register-form').addEventListener('submit',handleRegister);
-                L();
-            }} catch (error) {{
-                document.getElementById('root').innerHTML = '<p style="color: red; text-align: center;">Failed to load application components.</p>';
-                console.error("Decryption/Injection Error:", error);
-            }}
-        }}
-
+        // THIS FUNCTION (L) IS THE ONLY ONE THAT'S CHANGED
         function L(){{
             window.pywebview.api.get_products().then(p => {{
                 if (!p) return;
-                document.getElementById('product-list').innerHTML = p.map(i => `<div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4"><div class="w-16 h-16 pup-bg-burgundy rounded-lg flex items-center justify-center text-white"><i class="fas fa-tshirt"></i></div><div class="flex-1"><h4 class="font-semibold">${{i.name}}</h4><p class="text-sm text-gray-500">₱${{i.price.toFixed(2)}}</p></div><button onclick="handleAddToCart(${{i.id}})" class="bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm">ADD</button></div>`).join('') || '<p>No products available.</p>';
+                // It now generates an <img> tag for each product
+                document.getElementById('product-list').innerHTML = p.map(i => `
+                    <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4">
+                        <img src="${{i.image_url || '/static/images/placeholder.png'}}" alt="${{i.name}}" class="w-20 h-20 object-cover rounded-lg bg-gray-200">
+                        <div class="flex-1">
+                            <h4 class="font-semibold">${{i.name}}</h4>
+                            <p class="text-sm text-gray-500">₱${{i.price.toFixed(2)}}</p>
+                        </div>
+                        <button onclick="handleAddToCart(${{i.id}})" class="bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm">ADD</button>
+                    </div>
+                `).join('') || '<p>No products available.</p>';
             }});
         }}
 
+        // All other JS functions remain the same
         function showAuthSection(id){{document.querySelectorAll('.auth-section').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';}}
         function showAppSection(id){{document.querySelectorAll('.app-view').forEach(s=>s.style.display='none');document.getElementById(id).style.display='block';if(id==='cart-app-view')loadCart();if(id==='checkout-app-view')loadCheckoutSummary();}}
         function showMainApp(user){{document.getElementById('auth-view').style.display='none';document.getElementById('main-app-view').style.display='block';document.getElementById('user-name-display').textContent=`Welcome, ${{user.name}}!`;updateCartBadge();}}
@@ -67,14 +58,11 @@ def bootloader():
         
         window.addEventListener('pywebviewready', I);
     </script>
-</body>
-</html>
+</body></html>
     """
+    return bootloader_html
 
 @app.route('/data')
 def get_payload_data():
-    """This endpoint serves the obfuscated UI data as JSON."""
-    return jsonify({
-        'auth': payload.AUTH_PAYLOAD,
-        'app': payload.APP_PAYLOAD
-    })
+    """Serves the obfuscated UI data as JSON."""
+    return jsonify({'auth': payload.AUTH_PAYLOAD, 'app': payload.APP_PAYLOAD})
