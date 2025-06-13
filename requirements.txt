@@ -1,0 +1,6 @@
+Flask
+pywebview
+dominate
+Pillow
+# For building an executable
+pyinstaller
