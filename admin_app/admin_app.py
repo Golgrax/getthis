@@ -7,8 +7,6 @@ XOR_KEY = "Admin-Panel-Key-2024" # Must match the admin build script
 
 @app.route('/')
 def admin_bootloader():
-    # THE ONLY CHANGE IS ON THIS LINE: {{JSON.stringify(i)}}
-    # We use double curly braces to tell Python "this is a literal brace, not an f-string placeholder".
     js_bootloader = f"""
         <script>
             const K="{XOR_KEY}";
@@ -38,4 +36,5 @@ def admin_bootloader():
 
 @app.route('/data')
 def get_admin_payload():
+    # THIS IS THE CORRECTED LINE
     return jsonify({'payload': admin_payload.ADMIN_PAYLOAD})
