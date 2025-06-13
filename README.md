@@ -40,3 +40,47 @@ RUN
 Run the Admin
 
     python -m admin_app.admin_main
+
+
+
+
+### source
+
+```
+.
+├── README.md
+├── admin_app
+│   ├── __init__.py
+│   ├── admin_api.py
+│   ├── admin_app.py
+│   ├── admin_main.py
+│   ├── admin_payload.py
+│   └── admin_views.py
+├── assets
+│   ├── css
+│   │   └── style.css
+│   ├── fonts
+│   │   └── RocaOne.ttf
+│   └── images
+│       ├── 9.jpg
+│       ├── lanyard.png
+│       ├── pup_logo.png
+│       └── tshirt.png
+├── requirements.txt
+├── shared
+│   ├── __init__.py
+│   ├── builder.py
+│   └── database.py
+└── shop_app
+    ├── __init__.py
+    ├── api.py
+    ├── app.py
+    ├── content_payload.py
+    ├── layout_payload.py
+    ├── main.py
+    └── payload.py
+
+7 directories, 24 files
+```
+
+

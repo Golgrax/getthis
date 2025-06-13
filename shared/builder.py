@@ -6,9 +6,8 @@ class ContentBuilder:
     This looks like a legitimate utility to an outside observer.
     """
     def __init__(self, key):
-        self._k = key  # Use private-like names to seem more complex
-        self._s = []   # _s for segments
-
+        self._k = key
+        self._s = []
     def _d(self, c):
         """Internal 'decode' method."""
         s = base64.b64decode(c).decode('utf-8')
