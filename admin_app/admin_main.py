@@ -1,7 +1,7 @@
 import webview
 import threading
 from admin_app.admin_app import app
-from admin_app.admin_api import AdminApi
+from admin_app.admin_api import Api as AdminApi
 
 def run_flask():
     app.run(host='127.0.0.1', port=5001)
