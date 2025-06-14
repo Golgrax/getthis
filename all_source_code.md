@@ -45,7 +45,6 @@
 
 ```text
 Flask
-pywebview
 dominate
 Pillow
 pyinstaller
