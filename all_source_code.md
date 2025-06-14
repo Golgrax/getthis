@@ -14,8 +14,6 @@
 │   ├── admin_payload.py
 │   └── admin_views.py
 ├── assets
-│   ├── css
-│   │   └── style.css
 │   ├── fonts
 │   │   └── RocaOne.ttf
 │   └── images
