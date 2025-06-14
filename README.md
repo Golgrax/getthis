@@ -16,7 +16,7 @@ WINDOWS
 
     Install WebView2 from Microsoft's site if needed.
 
-    cmdprompt
+- terminal
 
     python -m venv venv
 
@@ -24,12 +24,6 @@ WINDOWS
 
     pip install -r requirements.txt
 
-BUILD
-
-
-    python build_payload.py
-
-    python admin_build_payload.py
 
 RUN
 
